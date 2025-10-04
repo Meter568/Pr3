@@ -9,7 +9,11 @@ const character = {
     damageHP: 250,
     elHP: document.getElementById('health-character'),
     elProgressbar: document.getElementById('progressbar-character'),
-    lost: false
+    lost: false,
+    renderHP: renderHP,
+    renderHPLife: renderHPLife,
+    renderProgressbarHP: renderProgressbarHP,
+    changeHP: changeHP,
 }
 
 const enemy1 = {
@@ -18,7 +22,11 @@ const enemy1 = {
     damageHP: 100,
     elHP: document.getElementById('health-enemy-1'),
     elProgressbar: document.getElementById('progressbar-enemy-1'),
-    lost: false
+    lost: false,
+    renderHP: renderHP,
+    renderHPLife: renderHPLife,
+    renderProgressbarHP: renderProgressbarHP,
+    changeHP: changeHP,
 }
 
 const enemy2 = {
@@ -27,22 +35,29 @@ const enemy2 = {
     damageHP: 100,
     elHP: document.getElementById('health-enemy-2'),
     elProgressbar: document.getElementById('progressbar-enemy-2'),
-    lost: false
+    lost: false,
+    renderHP: renderHP,
+    renderHPLife: renderHPLife,
+    renderProgressbarHP: renderProgressbarHP,
+    changeHP: changeHP,
 }
 
 function attack(character, enemy1, enemy2, maxDamage) {
     const damageToEnemy1 = random(maxDamage)
     console.log(`${character.name.innerText} attack ${enemy1.name.innerText} on ${damageToEnemy1} HP`)
-    changeHP(damageToEnemy1, enemy1)
+    enemy1.changeHP(damageToEnemy1)
+
     const damageToEnemy2 = random(maxDamage)
     console.log(`${character.name.innerText} attack ${enemy2.name.innerText} on ${damageToEnemy2} HP`)
-    changeHP(damageToEnemy2, enemy2)
+    enemy2.changeHP(damageToEnemy2)
+
     const counterDamage1 = random(maxDamage)
     console.log(`${enemy1.name.innerText} counterattacks ${character.name.innerText} on ${counterDamage1} HP`)
-    changeHP(counterDamage1, character)
+    character.changeHP(counterDamage1)
+
     const counterDamage2 = random(maxDamage)
     console.log(`${enemy2.name.innerText} counterattacks ${character.name.innerText} on ${counterDamage1} HP`)
-    changeHP(counterDamage2, character)
+    character.changeHP(counterDamage2)
 }
 
 function bindAttackButton(button, maxDamage, character, enemy1, enemy2) {
@@ -56,45 +71,46 @@ bindAttackButton($btnWave, 30, character, enemy1, enemy2)
 
 function init() {
     console.log('Start Game')
-    renderHP(character)
-    renderHP(enemy1)
-    renderHP(enemy2)
+    character.renderHP()
+    enemy1.renderHP()
+    enemy2.renderHP()
 }
 
-function renderHP(person) {
-    renderHPLife(person)
-    renderProgressbarHP(person)
+function renderHP() {
+    this.renderHPLife()
+    this.renderProgressbarHP()
 }
 
-function renderHPLife(person) {
-    person.elHP.innerText = person.damageHP + ' / ' + person.defaultHP;
+function renderHPLife() {
+    this.elHP.innerText = `${this.damageHP} / ${this.defaultHP}`;
 }
 
-function renderProgressbarHP(person) {
-    const hpPercent = person.damageHP;
-    person.elProgressbar.style.width = person.damageHP + '%';
-
-    person.elProgressbar.classList.remove('low', 'critical')
-
+function renderProgressbarHP() {
+    const hpPercent = this.damageHP;
+    this.elProgressbar.style.width = this.damageHP + '%';
+    this.elProgressbar.classList.remove('low', 'critical')
     if(hpPercent < 20) {
-        person.elProgressbar.classList.add("critical");
+        this.elProgressbar.classList.add("critical");
     } else if (hpPercent < 50) {
-        person.elProgressbar.classList.add("low");
+        this.elProgressbar.classList.add("low");
     }
 }
 
-function changeHP(count, person) {
-    if(person.damageHP < count) {
-        person.damageHP = 0;
-        if(!person.lost) {
-            alert('Poor ' + person.name.innerText + ' lost the fight!');
-            person.lost = true;
+function changeHP(count) {
+    if(this.damageHP < count) {
+        this.damageHP = 0;
+        if(!this.lost) {
+            alert('Poor ' + this.name.innerText + ' lost the fight!');
+            this.lost = true;
         }
     } else {
-        person.damageHP -= count;
+        this.damageHP -= count;
     }
-    renderHP(person);
+    this.renderHP();
+    checkGameOver();
+}
 
+function checkGameOver() {
     if(enemy1.damageHP === 0 && enemy2.damageHP === 0 && !gameOver) {
         alert(`${character.name.innerText} defeated both enemies!`)
         gameOver = true;
