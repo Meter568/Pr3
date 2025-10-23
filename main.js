@@ -43,15 +43,11 @@ const enemy2 = {
     changeHP: changeHP,
 }
 
-const {name: nameCharacter } = character
-const {name: nameEnemy1 } = enemy1
-const {name: nameEnemy2 } = enemy2
-
 const battle = {
     logs: []
 }
 
-function generateLog(firstPerson, secondPerson, damage) {
+const generateLog = (firstPerson, secondPerson, damage) => {
     const logs = [
         `${firstPerson.name.innerText} remembered something important, but suddenly ${secondPerson.name.innerText}, beside himself with fear, struck the enemy in the forearm.`,
         `${firstPerson.name.innerText} choked, and ${secondPerson.name.innerText}, in fright, delivered a direct knee strike to the enemy's forehead.`,
@@ -72,7 +68,7 @@ function generateLog(firstPerson, secondPerson, damage) {
     return fullLog;
 }
 
-function attack(character, enemy1, enemy2, maxDamage) {
+const attack = (character, enemy1, enemy2, maxDamage) => {
     $logs.innerHTML = '';
 
     const newLogs = [];
@@ -100,7 +96,7 @@ function attack(character, enemy1, enemy2, maxDamage) {
     });
 }
 
-function bindAttackButton(button, maxDamage, character, enemy1, enemy2) {
+const bindAttackButton = (button, maxDamage, character, enemy1, enemy2) => {
     button.addEventListener('click', () => {
         attack(character, enemy1, enemy2, maxDamage)
     })
@@ -109,7 +105,25 @@ function bindAttackButton(button, maxDamage, character, enemy1, enemy2) {
 bindAttackButton($btnKick, 20, character, enemy1, enemy2)
 bindAttackButton($btnWave, 30, character, enemy1, enemy2)
 
-function init() {
+function createButtonHandler(maxClick) {
+    let clickCount = 0
+    return function () {
+        if(maxClick === null || clickCount < maxClick) {
+            clickCount++
+            const remainingClicks = maxClick === null ? 'необмежений' : maxClick - clickCount;
+            console.log(`Кнопку натиснуто. Залишилося кліків: ${remainingClicks}`);
+            if(maxClick !== null && clickCount >= maxClick) {
+                console.log('Досягнуто максимальну кількість кліків. Відключення обробника подій.');
+                this.disabled = true;
+            }
+        }
+    }
+}
+
+$btnKick.addEventListener('click', createButtonHandler(10));
+$btnWave.addEventListener('click', createButtonHandler(3));
+
+const init = () => {
     console.log('Start Game')
     character.renderHP()
     enemy1.renderHP()
@@ -146,13 +160,12 @@ function changeHP(count) {
     } else {
         this.damageHP -= count;
         const log = this === enemy1 || this === enemy2 ? generateLog(this, character) : generateLog(this, enemy1) + ' ' + generateLog(this, enemy2);
-        console.log(log);
     }
     this.renderHP();
     checkGameOver();
 }
 
-function checkGameOver() {
+const checkGameOver = () => {
     const {name: nameCharacter, damageHP: damageHPCharacter, lost: lostCharacter } = character
     const {damageHP: damageHPEnemy1 } = enemy1
     const {damageHP: damageHPEnemy2 } = enemy2
@@ -172,7 +185,7 @@ function checkGameOver() {
     }
 }
 
-function random(num) {
+const random = (num) => {
     return Math.ceil(Math.random() * num)
 }
 
