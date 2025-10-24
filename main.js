@@ -2,6 +2,12 @@ const $btnKick = document.getElementById('btn-kick');
 const $btnWave = document.getElementById('btn-wave');
 const $logs = document.querySelector('#logs');
 
+$btnKick.dataset.originalText = $btnKick.innerText.trim();
+$btnWave.dataset.originalText = $btnWave.innerText.trim();
+
+$btnKick.innerText = `${$btnKick.dataset.originalText} (10 clicks left)`;
+$btnWave.innerText = `${$btnWave.dataset.originalText} (3 clicks left)`;
+
 let gameOver = false;
 
 const character = {
@@ -110,11 +116,11 @@ function createButtonHandler(maxClick) {
     return function () {
         if(maxClick === null || clickCount < maxClick) {
             clickCount++
-            const remainingClicks = maxClick === null ? 'необмежений' : maxClick - clickCount;
-            console.log(`Кнопку натиснуто. Залишилося кліків: ${remainingClicks}`);
+            const remainingClicks = maxClick === null ? 'unlimited' : maxClick - clickCount;
+            this.textContent = `${this.dataset.originalText} (${remainingClicks} clicks left)`;
             if(maxClick !== null && clickCount >= maxClick) {
-                console.log('Досягнуто максимальну кількість кліків. Відключення обробника подій.');
                 this.disabled = true;
+                this.textContent = `${this.dataset.originalText} (exhausted)`;
             }
         }
     }
