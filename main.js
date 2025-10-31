@@ -1,107 +1,69 @@
 import Pokemon from "./pokemon.js";
-import { attack, createButtonHandler, generateLog } from "./utils.js";
+import { attack, countBtn } from "./utils.js";
+import { pokemons } from "./pokemons.js";
 
-const $btnKick = document.getElementById('btn-kick');
-const $btnWave = document.getElementById('btn-wave');
-export const $logs = document.querySelector('#logs');
+const $img1 = document.querySelector('.sprite1');
+const $img2 = document.querySelector('.sprite2');
+const $img3 = document.querySelector('.sprite3');
 
-$btnKick.dataset.originalText = $btnKick.innerText.trim();
-$btnWave.dataset.originalText = $btnWave.innerText.trim();
+const $characterName = document.querySelector('#name-player1');
+const $enemyName1 = document.querySelector('#name-player2');
+const $enemyName2 = document.querySelector('#name-player3');
 
-$btnKick.innerText = `${$btnKick.dataset.originalText} (10 clicks left)`;
-$btnWave.innerText = `${$btnWave.dataset.originalText} (3 clicks left)`;
-
-let gameOver = false;
-
-const character = new Pokemon({
-    name: document.getElementById('name-character'),
-    defaultHP: 250,
-    damageHP: 250,
-    elHP: document.getElementById('health-character'),
-    elProgressbar: document.getElementById('progressbar-character'),
-    lost: false,
+const pikachu = pokemons.find(item => item.name === 'Pikachu');
+export const player1 = new Pokemon({
+    ...pikachu,
+    selector: 'player1'
 })
+$img1.src = pikachu.img;
+$img1.alt = pikachu.name;
+$characterName.textContent = pikachu.name;
 
-const enemy1 = new Pokemon({
-    name: document.getElementById('name-enemy-1'),
-    defaultHP: 100,
-    damageHP: 100,
-    elHP: document.getElementById('health-enemy-1'),
-    elProgressbar: document.getElementById('progressbar-enemy-1'),
-    lost: false,
+const index1 = Math.floor(Math.random() * (pokemons.length - 1)) + 1;
+
+const randomPokemon1 = pokemons[index1];
+export const player2 = new Pokemon({
+    ...randomPokemon1,
+    selector: 'player2'
 })
+$img2.src = randomPokemon1.img;
+$img2.alt = randomPokemon1.name;
+$enemyName1.textContent = randomPokemon1.name;
 
-const enemy2 = new Pokemon({
-    name: document.getElementById('name-enemy-2'),
-    defaultHP: 100,
-    damageHP: 100,
-    elHP: document.getElementById('health-enemy-2'),
-    elProgressbar: document.getElementById('progressbar-enemy-2'),
-    lost: false,
+let index2;
+do {
+    index2 = Math.floor(Math.random() * (pokemons.length - 1)) + 1;
+} while (index2 === index1);
+
+const randomPokemon2 = pokemons[index2];
+export const player3 = new Pokemon({
+    ...randomPokemon2,
+    selector: 'player3'
 })
+$img3.src = randomPokemon2.img;
+$img3.alt = randomPokemon2.name;
+$enemyName2.textContent = randomPokemon2.name;
 
-const bindAttackButton = (button, maxDamage, character, enemy1, enemy2) => {
-    button.addEventListener('click', () => {
-        attack(character, enemy1, enemy2, maxDamage)
+const $control = document.querySelector('.control');
+player1.attacks.forEach(attackData => {
+    const $btn = document.createElement('button');
+    $btn.classList.add('button');
+    $btn.innerText = `${attackData.name}`;
+    const btnCount = countBtn(attackData.maxCount, $btn);
+    $btn.addEventListener('click', () => {
+        attack(player1, player2, player3, attackData.maxDamage);
+        btnCount();
     })
-}
+    $control.appendChild($btn);
+})
 
-bindAttackButton($btnKick, 20, character, enemy1, enemy2)
-bindAttackButton($btnWave, 30, character, enemy1, enemy2)
-
-$btnKick.addEventListener('click', createButtonHandler(10));
-$btnWave.addEventListener('click', createButtonHandler(3));
+export const $logs = document.querySelector('#logs');
 
 const init = () => {
     console.log('Start Game')
-    character.renderHP()
-    enemy1.renderHP()
-    enemy2.renderHP()
-}
-
-function changeHP(count){
-    if(this.damageHP < count) {
-        this.damageHP = 0;
-        if(!this.lost) {
-            alert(`Poor ${this.name.innerText} has lost the fight!`)
-            this.lost = true;
-        }
-    } else {
-        this.damageHP -= count;
-        if(typeof generateLog === 'function') {
-            if(this === enemy1 || this === enemy2) {
-                generateLog(this, character);
-            } else {
-                generateLog(this, enemy1) + ' ' + generateLog(this, enemy2);
-            }
-        }
-    }
-    this.renderHP();
-    checkGameOver();
-}
-
-character.changeHP = changeHP.bind(character);
-enemy1.changeHP = changeHP.bind(enemy1);
-enemy2.changeHP = changeHP.bind(enemy2);
-
-const checkGameOver = () => {
-    const {name: nameCharacter, damageHP: damageHPCharacter } = character
-    const {damageHP: damageHPEnemy1 } = enemy1
-    const {damageHP: damageHPEnemy2 } = enemy2
-
-    if(damageHPEnemy1 === 0 && damageHPEnemy2 === 0 && !gameOver) {
-        alert(`${nameCharacter.innerText} defeated both enemies!`)
-        gameOver = true;
-        $btnKick.disabled = true;
-        $btnWave.disabled = true;
-    } 
-    if(damageHPCharacter === 0) {
-        alert(`${nameCharacter.innerText} has fallen! The enemies have won.`)
-        character.lost = true;
-        gameOver = true;
-        $btnKick.disabled = true;
-        $btnWave.disabled = true;
-    }
+    player1.renderHP()
+    player2.renderHP()
+    player3.renderHP()
 }
 
 init();

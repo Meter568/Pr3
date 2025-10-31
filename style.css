@@ -43,6 +43,7 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 20px;
 }
 
@@ -153,7 +154,23 @@ body {
     -webkit-transform: rotate(-45deg);
     transform: rotate(-45deg);
 }
-.pokemon .sprite {
+.pokemon .sprite1 {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    max-width: 100px;
+}
+.pokemon .sprite2 {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    max-width: 100px;
+}
+.pokemon .sprite3 {
     position: absolute;
     top: 40%;
     left: 50%;
@@ -262,7 +279,15 @@ body {
 .pokemon.selected .pokeball {
     opacity: 0.8;
 }
-.pokemon.selected .sprite {
+.pokemon.selected .sprite1 {
+    -webkit-animation: bounce 0.8s ease infinite;
+    animation: bounce 0.8s ease infinite;
+}
+.pokemon.selected .sprite2 {
+    -webkit-animation: bounce 0.8s ease infinite;
+    animation: bounce 0.8s ease infinite;
+}
+.pokemon.selected .sprite3 {
     -webkit-animation: bounce 0.8s ease infinite;
     animation: bounce 0.8s ease infinite;
 }
